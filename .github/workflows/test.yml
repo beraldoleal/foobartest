@@ -1,0 +1,47 @@
+name: Release tests
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+        default: '0.0'
+      devel_name:
+        description: 'Developer Name'
+        required: true
+        default: 'Avocado Developer'
+      devel_mail:
+        description: 'Developer mail'
+        required: true
+        default: 'avocado@redhat.com'
+      rtd_project:
+        description: 'readthedocs project name'
+        required: true
+        default: 'avocado-framework'
+
+jobs:
+
+  release:
+    name: Release pipeline
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:34
+    env:
+      DEVEL_NAME: ${{ github.event.inputs.devel_name }}
+      DEVEL_MAIL: ${{ github.event.inputs.devel_mail }}
+
+    steps:
+      - name: install required packages
+        run:  dnf -y install rpmdevtools git python3-pip make
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Update VERSION files and python-avocado.spec
+        run: |
+          set | grep DEVEL
+          make test
+      - name: Commit files and tag
+        run: |
+          set
+          make test
